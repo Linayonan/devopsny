@@ -10,7 +10,7 @@ on:
         default: false
 env:
       SMHI_API_KEY: ${{ secrets.SMHI_API_KEY_LINA }}
-      DOCKER_IMAGE_NAME: linayonan/Dockerfil_lina  
+      DOCKER_IMAGE_NAME: linayonan/linadockerrepo
       
 jobs:
   fetch_and_extract_temperature: 
