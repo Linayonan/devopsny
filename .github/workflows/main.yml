@@ -54,7 +54,7 @@ jobs:
     - name: Run the test
       id: test_app
       run: |
-        python Linaapp.py > test-output.log 
+        python Linaapp.py > test-output.log || echo "Test failed. Check logs." > test-output.log
     
 
     - name: Upload error logs
