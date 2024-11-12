@@ -9,7 +9,7 @@ on:
         required: true
         default: false
 env:
-      SMHI_API_KEY: ${{ secrets.SMHI_API_KEY_LINA }}
+      SMHI_API_KEY: ${{ secrets.SMHI_API_KEY }}
       DOCKER_IMAGE_NAME: linayonan/linadockerrepo
       
 jobs:
@@ -33,7 +33,7 @@ jobs:
 
     - name: Fetch data from SMHI API
       env:
-          SMHI_API_KEY: ${{ secrets.SMHI_API_KEY_LINA }}
+          SMHI_API_KEY: ${{ secrets.SMHI_API_KEY }}
       run: |
           API_URL="https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/18.0686/lat/59.3293/data.json"
           curl -s "$API_URL" -o weather_data.json 
@@ -87,7 +87,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.LINA_DOCKER_USERNAME }}
-          password: ${{ secrets.LINA_DOCKER_PASSWORD }}
+          password: ${{ secrets.LINA_DOCKER_PASSWORD }} 
 
       - name: Build Docker image
         run: |
@@ -96,7 +96,6 @@ jobs:
       - name: Push Docker image
         run: |
            docker push ${{ env.DOCKER_IMAGE_NAME }}:latest
-
 
   deploy_to_azure:
     runs-on: ubuntu-latest
