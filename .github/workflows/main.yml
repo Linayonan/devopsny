@@ -1,4 +1,3 @@
-
 name: Build Test and Depoly Application
 
 on:
@@ -7,9 +6,8 @@ on:
       log_errors:
         description: 'Log errors if tests fail'
         required: true
-        default: false
+        default: 'true'
 env:
-      SMHI_API_KEY: ${{ secrets.SMHI_API_KEY }}
       DOCKER_IMAGE_NAME: linayonan/linadockerrepo
       
 jobs:
@@ -44,10 +42,7 @@ jobs:
 
     - name: Extract temperature from weather data
       run: |
-        # Use jq to extract the temperature value from the JSON file
         TEMP=$(jq '.timeSeries[0].parameters[] | select(.name == "t") .values[0]' weather_data.json)
-
-        # Check if TEMP is not empty and then log and set the environment variable
         if [ -n "$TEMP" ]; then
           echo "Extracted Temperature: $TEMP"
           echo "TEMP=$TEMP" >> $GITHUB_ENV
@@ -76,12 +71,7 @@ jobs:
 
       steps:
       - name: Checkout Code
-        uses: actions/checkout@v
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+        uses: actions/checkout@v3
         
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -90,14 +80,12 @@ jobs:
           password: ${{ secrets.LINA_DOCKER_PASSWORD }} 
 
       - name: Build Docker image
-        run: |
-           docker build -t $DOCKER_IMAGE_NAME:latest .
+        run: docker build -t $DOCKER_IMAGE_NAME:latest .
 
       - name: Push Docker image
-        run: |
-           docker push ${{ env.DOCKER_IMAGE_NAME }}:latest
+        run: docker push $DOCKER_IMAGE_NAME:latest
 
-  deploy_to_azure:
+  deploy_to_azure_webapp:
     runs-on: ubuntu-latest
     needs: build_docker_image
 
@@ -110,4 +98,4 @@ jobs:
       with:
         app-name: ${{ secrets.AZURE_NAME }}
         publish-profile: ${{ secrets.AZURE_PASSWORD }}
-        images: ${{ env.DOCKER_IMAGE_NAME }}:latest
+        images: $DOCKER_IMAGE_NAME:latest
