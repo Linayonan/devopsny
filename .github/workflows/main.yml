@@ -51,11 +51,9 @@ jobs:
           exit 1
         fi
 
-    - name: Run the test
-      id: test_app
+    - name: Run tests with pytest
       run: |
-        python Linaapp.py > test-output.log || echo "Test failed. Check logs." > test-output.log
-    
+        pytest > test-output.log || echo "Test failed. Check logs." > test-output.log
 
     - name: Upload error logs
       if: ${{ github.event.inputs.log_errors == 'true' && failure() }}
