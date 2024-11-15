@@ -3,6 +3,9 @@ import requests
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return'This is Flask python web app'
 
 API_URL = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/18.0686/lat/59.3293/data.json"
 
