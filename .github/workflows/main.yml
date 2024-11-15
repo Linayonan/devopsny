@@ -28,7 +28,6 @@ jobs:
       run: |
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-
     - name: Fetch data from SMHI API
       env:
           SMHI_API_KEY: ${{ secrets.SMHI_API_KEY }}
@@ -63,7 +62,7 @@ jobs:
         path: test-output.log
   
   build_docker_image:
-      name: Build Docker image
+      name: Build and Push Docker Image to ACR
       runs-on: ubuntu-latest
       needs: fetch_and_extract_temperature
 
@@ -71,17 +70,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v1
         with:
-          username: ${{ secrets.LINA_DOCKER_USERNAME }}
-          password: ${{ secrets.LINA_DOCKER_PASSWORD }} 
+         login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+         username: ${{ secrets.AZURE_NAME }}
+         password: ${{ secrets.AZURE_PASSWORD }}
 
-      - name: Build Docker image
-        run: docker build -t $DOCKER_IMAGE_NAME:latest .
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/linadockerrepo:latest .
 
-      - name: Push Docker image
-        run: docker push $DOCKER_IMAGE_NAME:latest
+      - name: Push Docker Image to ACR
+        run: docker push ${{ secrets.ACR_LOGIN_SERVER }}/linadockerrepo:latest
+
 
   deploy_to_azure_webapp:
     runs-on: ubuntu-latest
