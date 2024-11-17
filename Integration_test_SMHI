@@ -1,0 +1,18 @@
+import requests
+
+def test_smhi_api_integration():
+    api_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/18.0686/lat/59.3293/data.json"
+
+    response = requests.get(api_url)
+
+    assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
+
+    json_data = response.json()
+    assert "timeSeries" in json_data, "Missing 'timeSeries' in response"
+    assert "parameters" in json_data["timeSeries"][0], "Missing 'parameters' in timeSeries"
+
+    temp = next((p for p in json_data["timeSeries"][0]["parameters"] if p["name"] == "t"), None)
+    assert temp, "Temperature parameter 't' not found"
+    assert "values" in temp, "Missing 'values' in temperature parameter"
+
+    print("Integration test for SMHI API passed.")
