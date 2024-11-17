@@ -11,6 +11,8 @@ on:
 permissions:
   id-token: write
   contents: read
+  packages: write
+  deployments: write
   
 env:
       DOCKER_IMAGE_NAME: linayonan/linadockerrepo
