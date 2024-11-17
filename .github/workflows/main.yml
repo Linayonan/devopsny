@@ -7,6 +7,11 @@ on:
         description: 'Log errors if tests fail'
         required: true
         default: 'true'
+
+permissions:
+  id-token: write
+  contents: read
+  
 env:
       DOCKER_IMAGE_NAME: linayonan/linadockerrepo
       
