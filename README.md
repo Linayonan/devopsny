@@ -1,2 +1,2 @@
-# devopsny 
-# repo för att extrahera info från API, testa och deploya det till cloud
+# Devopsny 
+# Repo för att extrahera info "t" API, testa och deploya det till cloud
