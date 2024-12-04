@@ -1,37 +1,42 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask
 import requests
+from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(name)
 
-API_URL = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/18.0686/lat/59.3293/data.json"
+@app.route("/")
+def fetchweather():
 
-def get_temperature():
-    try:
-        response = requests.get(API_URL)
-        response.raise_for_status()
+    apiurl = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/18.0686/lat/59.3293/data.json"
+    headers = {
+        "Accept": "application/json",
+        "User-Agent": "weather-app",
+    }
+    response = requests.get(apiurl, headers=headers)
+    if response.statuscode == 200:
         data = response.json()
-        
-        for time_series in data.get('timeSeries', []):
-            for param in time_series.get("parameters", []):
-                if param['name'] == 't':  # Temperatur
-                    return param["values"][0]
-        return None
-    except requests.RequestException as e:
-        print("Error fetching data:", e)
-        return None
+        time_series = data["timeSeries"][0]
+        parameters = time_series["parameters"]
 
-@app.route('/')
-def index():
-    temperature = get_temperature()
-    if temperature is not None:
-        return render_template('index.html', temperature=temperature)
+        temperature = None
+        for param in parameters:
+            if param["name"] == "t":
+                temperature = f"{param['values'][0]} C"
+                break
+
+        if temperature:
+            result = f"""
+            <h2><strong>Data fetched at Stockholm</strong></h2>
+            <strong>Temperature:</strong> {temperature}<br>
+            """
+        else:
+            result = "Temperature data from SMHI is not available."
+
+        return result
+
     else:
-        return "Failed to fetch temperature data."
+        return "Failed to fetch data from SMHI API", response.status_code
 
-@app.route('/api/temperature')
-def temperature_api():
-    temperature = get_temperature()
-    return jsonify({"temperature": temperature})
+if __name == "__main":
+    app.run(host="0.0.0.0", port=80)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True)
