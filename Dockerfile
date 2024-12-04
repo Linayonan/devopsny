@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir flask requests
 
 EXPOSE 80
 
-CMD ["yml", "main.yml"]
+CMD ["python", "app.py"]
